@@ -1,9 +1,11 @@
 package com.sda.hangman.domain;
 
+import com.sda.hangman.domain.model.GameStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -54,4 +56,77 @@ public class HangmanGameServiceTest {
 
     }
 
+    @Test
+    public void processNextLetter_should_update_characterState_when_there_is_letter_in_phrase() {
+        //given
+        GameStatus gameStatusExpected = new GameStatus("Player", "Anna");
+        GameStatus gameStatus = new GameStatus("Player", "Anna");
+
+        //when
+        hangmanGameService.processNextLetter('a', gameStatus);
+        //then
+        Assert.assertNotEquals(gameStatusExpected.getPhraseState(), gameStatus.getPhraseState());
+    }
+
+    @Test
+    public void processNextLetter_should_not_update_characterState_when_there_is_letter_in_phrase() {
+        //given
+        GameStatus gameStatusExpected = new GameStatus("Player", "Anna");
+        GameStatus gameStatus = new GameStatus("Player", "Anna");
+
+        //when
+        hangmanGameService.processNextLetter('v', gameStatus);
+        //then
+        Assert.assertEquals(gameStatusExpected.getPhraseState(), gameStatus.getPhraseState());
+
+    }
+
+    @Test
+    public void processNextLetter_should_update_success_attempts_when_there_is_letter_in_phrase() {
+        //given
+        GameStatus gameStatus = new GameStatus("Player", "Anna");
+
+        //when
+        hangmanGameService.processNextLetter('a', gameStatus);
+        //then
+        Assert.assertEquals(1, gameStatus.getSuccessAttempts().intValue());
+    }
+
+    @Test
+    public void processNextLetter_should_update_failed_attempts_when_there_is__not_letter_in_phrase() {
+        //given
+        GameStatus gameStatus = new GameStatus("Player", "Anna");
+        //when
+        hangmanGameService.processNextLetter('c', gameStatus);
+        //then
+        Assert.assertEquals(1, gameStatus.getFailedAttempts().intValue());
+
+    }
+
+    @Test
+    public void processNextLetter_should_update_history_for_new_letter() {
+        //given
+        GameStatus gameStatus = new GameStatus("Player", "Anna");
+        //when
+        hangmanGameService.processNextLetter('o', gameStatus);
+        //then
+        Assert.assertEquals(1, gameStatus.getHistory().size());
+    }
+
+
+//    @Test
+//    public void processNextLetter_should_not_update_history_for_new_existing_letter() {
+//        //given
+//        List<Character> history = new ArrayList<>();
+//        history.add('a');
+//        GameStatus gameStatus = GameStatus.builder()
+//                .phrase("Ala ma kota")
+//                .phraseState(new Character["Ala ma kota".length()])
+//                .history(history)
+//                .build();
+//        //when
+//        hangmanGameService.processNextLetter('a', gameStatus);
+//        //then
+//        Assert.assertEquals(1, gameStatus.getHistory().size());
+//    }
 }
